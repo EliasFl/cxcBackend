@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { createConnection } from "typeorm";
+import { createConnection, ConnectionOptions } from "typeorm";
 import * as bodyParser from "body-parser";
 import { Request, Response } from "express";
 import * as express from "express";
@@ -7,7 +7,19 @@ import { Routes } from "./routes";
 
 async function startServer() {
   try {
-    const connection = await createConnection()
+    const connection = await createConnection(<ConnectionOptions>{
+      type: "postgres",
+      // extra: {
+      //   ssl: true,
+      // },
+
+      url: process.env.DATABASE_URL || "postgres://elias:@localhost:5432/unapec",
+      entities: ["src/models/**/*.ts"],
+      migrations: ["src/migration/**/*.ts"],
+      subscribers: ["src/subscriber/**/*.ts"],
+      synchronize: true,
+      logging: false,
+    })
   } catch (error) {
     console.log(`ERROR: ${error}`)
   }
